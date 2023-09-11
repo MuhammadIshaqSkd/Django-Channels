@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Lobby</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+</head>
+<body>
+    <h1>Lets chat!</h1>
+
+    <!-- Add a dropdown select element -->
+    <label for="roomSelect">Select a room:</label>
+    <select id="roomSelect">
+        <option value="Pakistan">Pakistan</option>
+        <option value="India">India</option>
+        <option value="ALL">ALL</option>
+    </select>
+
+    <form id="form">
+        <input type="text" name="message"/>
+    </form>
+
+    <div id="messages"></div>
+
+    <script type="text/javascript">
+        let roomName = 'Pakistan'; // Default roomName
+        let roomSelect = document.getElementById('roomSelect');
+
+        // Event listener to update the roomName when the select option changes
+        roomSelect.addEventListener('change', function () {
+            roomName = this.value;
+            updateWebSocketUrl();
+        });
+
+        // Function to update the WebSocket URL based on the selected roomName
+        function updateWebSocketUrl() {
+            let url = `ws://${window.location.host}/ws/socket-server/` + roomName + "/";
+            chatSocket.close(); // Close the current WebSocket connection
+            chatSocket = new WebSocket(url); // Create a new WebSocket connection
+        }
+
+        // Initialize the WebSocket connection
+        let url = `ws://${window.location.host}/ws/socket-server/` + roomName + "/";
+        let chatSocket = new WebSocket(url);
+
+        chatSocket.onmessage = function(e) {
+            let data = JSON.parse(e.data);
+            console.log('Data:', data);
+
+            if (data.type === 'chat') {
+                let messages = document.getElementById('messages');
+
+                messages.insertAdjacentHTML('beforeend', `<div>
+                                    <p>${data.message}</p>
+                                </div>`);
+            }
+        }
+
+        let form = document.getElementById('form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let message = e.target.message.value;
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'roomName': roomName
+            }));
+            form.reset();
+        });
+
+    </script>
+</body>
+</html>

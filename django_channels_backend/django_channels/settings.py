@@ -31,13 +31,23 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+
+    'channels',
+
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'posts',
+    'chat',
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -68,19 +78,29 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'django_channels.wsgi.application'
+ASGI_APPLICATION = 'django_channels.asgi.application'
 
+CHANNEL_LAYERS = {
+    'default':{
+        'BACKEND':'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        "ENGINE": "django.db.backends.postgresql",
+        'NAME': 'django-channels',
+        'USER': 'postgres',
+        'PASSWORD': 'Ishaq123!@#',
+        'HOST': 'localhost',  # Or an IP Address that your DB is hosted on
+        'PORT': '5432',
     }
 }
 
-
+AUTH_USER_MODEL = "chat.User"
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
